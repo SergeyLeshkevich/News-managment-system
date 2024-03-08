@@ -1,0 +1,32 @@
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: api-news
+server:
+  port: 8083
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+        SQL: DEBUG
+
+cache:
+  algorithm: LFU
+  capacity: 5
+
+aop:
+  logging:
+    enabled: true
+
+exception:
+  handling:
+    enabled: true

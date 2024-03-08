@@ -1,0 +1,235 @@
+version: '3.8'
+services:
+
+  ## Config Server
+  config-server:
+    build: configserver
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/SergeyLeshkevich/config-server-nms
+    healthcheck:
+      test: curl http://localhost:8888 || exit 1
+      interval: 5s
+      timeout: 3s
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "config-server"
+  
+  ## MySQL Docker Compose Config
+  postgres-news:
+    image: 'postgres:13.1-alpine'
+    container_name: postgres-news
+    hostname: postgres
+    restart: on-failure
+    ports:
+      - "5433:5433"
+    command: -p 5433
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=nms_news_service
+    healthcheck:
+      test: pg_isready -U postgres -d nms_news_service
+      interval: 10s
+      timeout: 5s
+    networks:
+      backend:
+        aliases:
+          - "postgres-news"
+
+  postgres-comment:
+    image: 'postgres:13.1-alpine'
+    container_name: postgres-comment
+    hostname: postgres
+    restart: on-failure
+    ports:
+      - "5434:5434"
+    command: -p 5434
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=nms_comment_service
+    healthcheck:
+      test: pg_isready -U postgres -d nms_comment_service
+      interval: 10s
+      timeout: 5s
+    networks:
+      backend:
+        aliases:
+          - "postgres-comment"
+            
+  postgres-auth:
+    image: 'postgres:13.1-alpine'
+    container_name: postgres-auth
+    hostname: postgres
+    restart: on-failure
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=nms_auth_service
+    healthcheck:
+      test: pg_isready -U postgres -d nms_auth_service
+      interval: 10s
+      timeout: 5s
+    networks:
+      backend:
+        aliases:
+          - "postgres-auth"
+
+  ## Redis
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "redis"
+  
+  ## Eureka Server
+  discovery-server:
+    build: eureka-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "discovery-server"
+  
+  ## Gateway Server
+  api-gateway:
+    build: api-gateway
+    container_name: api-gateway
+    ports:
+      - "8082:8082"
+    expose:
+      - "8082"
+    depends_on:
+      discovery-server:
+        condition: service_started
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "api-gateway"
+
+  ## News-Service Docker Compose Config
+  news-service:
+    container_name: news-service
+    ports:
+      - "8086:8086"
+    build: news-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-news:5433/nms_news_service
+    depends_on:
+      config-server:
+        condition: service_started
+      postgres-news:
+        condition: service_started
+      redis:
+        condition: service_started
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "news-service"
+
+    ## Comment-Service Docker Compose Config
+  comment-service:
+    container_name: comment-service
+    ports:
+      - "8085:8085"
+    build: comment-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-comment:5434/nms_comment_service
+    depends_on:
+      config-server:
+        condition: service_started
+      postgres-comment:
+        condition: service_started
+      redis:
+        condition: service_started
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "comment-service"
+    
+    ## Auth-Service Docker Compose Config
+  auth-service:
+    container_name: auth-service
+    ports:
+      - "9090:9090"
+    build: comment-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-auth:5432/nms_auth_service
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      config-server:
+        condition: service_started
+      postgres-auth:
+        condition: service_started
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "auth-service"
+    
+    ## Api-News Docker Compose Config
+  api-news:
+    container_name: api-news
+    build: api-news
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8083:8083"
+    depends_on:
+      comment-service:
+        condition: service_started
+      news-service:
+        condition: service_started
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+    restart: always
+    networks:
+      backend:
+        aliases:
+          - "api-news"
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local

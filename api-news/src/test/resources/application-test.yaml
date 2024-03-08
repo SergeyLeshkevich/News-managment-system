@@ -1,0 +1,28 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  main:
+    allow-circular-references: true
+  application:
+    name: api-news
+server:
+  port: 8083
+
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+        SQL: DEBUG
+
+aop:
+  logging:
+    enabled: false
+
+exception:
+  handling:
+    enabled: false
