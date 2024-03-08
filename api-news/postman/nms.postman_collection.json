@@ -1,0 +1,626 @@
+{
+	"info": {
+		"_postman_id": "10646e00-3232-4e11-a123-613294891911",
+		"name": "nms",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28834266"
+	},
+	"item": [
+		{
+			"name": "collection",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"test1@gmail.com\",\r\n    \"password\": \"100\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9090/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Test Test\",\r\n    \"username\": \"test3@gmail.com\",\r\n    \"password\": \"100\",\r\n    \"passwordConfirmation\": \"100\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9090/auth/register",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refrash",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpZCI6Mywicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfU1VCU0NSSUJFUiJdLCJleHAiOjE0NjY4NTAzMzA0fQ.XyiDkjpWe_4KepPtkBcoNZMrL3vhkWR7pWiVaczxSpobub1qmpbwIWduHLxwHnNqF6f0CEpD1auqZOsJsR5h7w\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9090/auth/refresh",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"auth",
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "validate",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MUBnbWFpbC5jb20iLCJpZCI6Mywicm9sZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfU1VCU0NSSUJFUiJdLCJleHAiOjE0NjY4NTQ3NjQzfQ.AWLbpe35v-0ivqlppZdX5eLDPeTGPTYk2oapY3Og1kaig_Lw5BdtqcwMHL21P21xG8Aykk42OgBKG66sOJMnVg",
+									"options": {
+										"raw": {
+											"language": "text"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8082/auth/validate",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"auth",
+										"validate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "api-news",
+					"item": [
+						{
+							"name": "comment",
+							"item": [
+								{
+									"name": "get all by idNews",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8083/api/comments/news/1?pageSize=5&numberPage=1",
+											"host": [
+												"localhost"
+											],
+											"port": "8083",
+											"path": [
+												"api",
+												"comments",
+												"news",
+												"1"
+											],
+											"query": [
+												{
+													"key": "pageSize",
+													"value": "5"
+												},
+												{
+													"key": "numberPage",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get",
+									"request": {
+										"method": "GET",
+										"header": []
+									},
+									"response": []
+								},
+								{
+									"name": "get from archive",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8081/comments/archive/25",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments",
+												"archive",
+												"25"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get all from archive",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8081/comments/archive?pageSize=5&numberPage=1",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments",
+												"archive"
+											],
+											"query": [
+												{
+													"key": "pageSize",
+													"value": "5"
+												},
+												{
+													"key": "numberPage",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get all",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8081/comments?pageSize=5&numberPage=1",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments"
+											],
+											"query": [
+												{
+													"key": "pageSize",
+													"value": "5"
+												},
+												{
+													"key": "numberPage",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create comment",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"text\": \"Comment new\",\r\n    \"username\": \"User new\",\r\n    \"newsId\": 1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8081/comments",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update comment",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"text\": \"Comment update\",\r\n    \"username\": \"User update\",\r\n    \"newsId\": 1\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8081/comments/1",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "archive",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "localhost:8081/comments/1",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "search",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8081/comments/search?search=User&offset=0&limit=100",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"comments",
+												"search"
+											],
+											"query": [
+												{
+													"key": "search",
+													"value": "User"
+												},
+												{
+													"key": "offset",
+													"value": "0"
+												},
+												{
+													"key": "limit",
+													"value": "100"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "news",
+							"item": [
+								{
+									"name": "get",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8080/news/1",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get from archive",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8080/news/archive/9",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news",
+												"archive",
+												"9"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get all from archive",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8080/news/archive",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news",
+												"archive"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get all",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8080/news?pageSize=5&numberPage=1",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news"
+											],
+											"query": [
+												{
+													"key": "pageSize",
+													"value": "5"
+												},
+												{
+													"key": "numberPage",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create news",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"News new\",\r\n  \"text\": \"This is the text of news new\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8080/news",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update news",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"News new\",\r\n  \"text\": \"This is the text of news update\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8080/news/7",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news",
+												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "archive",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "localhost:8080/news/7",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"news",
+												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "search",
+									"request": {
+										"method": "GET",
+										"header": []
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "get",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Test Test\",\r\n    \"username\": \"test1@gmail.com\",\r\n    \"password\": \"100\",\r\n    \"passwordConfirmation\": \"100\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9090/users/admin?role=ROLE_ADMIN",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"users",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "role",
+											"value": "ROLE_ADMIN"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Test1 Test\",\r\n    \"username\": \"test1@gmail.com\",\r\n    \"password\": \"100\",\r\n    \"passwordConfirmation\": \"100\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:9090/api/v1/users/3",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "archive",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
