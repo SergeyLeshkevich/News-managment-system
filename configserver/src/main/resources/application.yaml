@@ -5,5 +5,5 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/SergeyLeshkevich/config-server-nms
+          uri: https://github.com/SergeyLeshkevich/config-server-git
           default-label: master

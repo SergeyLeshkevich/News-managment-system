@@ -1,140 +1,295 @@
-//package ru.clevertec.news.integration;
-//
-//import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.web.reactive.function.client.ClientResponse;
-//import org.springframework.web.reactive.function.client.WebClient;
-//import ru.clevertec.news.service.CommentService;
-//
-//import java.util.Map;
-//
-//import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-//import static com.github.tomakehurst.wiremock.client.WireMock.get;
-//import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-//import static org.assertj.core.api.Assertions.assertThat;
-//
-//
-//@SpringBootTest
-//@WireMockTest(httpPort = 9998)
-//@ActiveProfiles("test")
-//class CommentIntegrationTest {
-//
-//
-//    @Autowired
-//    private CommentService commentService;
-//
-//    @Autowired
-//    private WebClient.Builder webClient;
-//
-//    @Test
-//    void test(){
-//        stubFor(get("/comments/1").willReturn(aResponse().withStatus(200)));
-//        ClientResponse block = webClient.build().get()
-//                .uri(uriBuilder ->
-//                        uriBuilder
-//                                .scheme("http")
-//                                .host("localhost")
-//                                .port(9998)
-//                                .path("/comments/{id}")
-//                                .build(Map.of("id", 1))
-//                )
-//                .exchange().block();
-//        assertThat(block.statusCode().is2xxSuccessful()).isTrue();
-//
-//    }
-//
-//
-//    //    @Test
-////    void shouldReturnCommentWhenCommentExists() throws JsonProcessingException {
-////
-////        CommentRequest commentRequest = CommentRequestTestBuilder.aCommentRequest().build();
-////        String json = mapper.writeValueAsString(commentRequest);
-////
-////        CommentResponse commentResponse = CommentResponseTestBuilder.aCommentResponse().build();
-////        ResponseEntity<CommentResponse> expected = ResponseEntity.ok().body(commentResponse);
-////
-////        stubFor(WireMock.get("/comment-server/comments/1")
-////                .willReturn(aResponse()
-////                        .withStatus(200)
-////                        .withHeader("Content-Type", "application/json")
-////                        .withBody(json)));
-////
-////        ResponseEntity<CommentResponse> actual = commentService.get(1L).block();
-////
-////        assertThat(actual).isEqualTo(expected);
-////    }
-////    @Test
-////    void shouldReturnCommentWhenCommentExists() throws JsonProcessingException {
-////        // Arrange
-////        Long commentId = 1L;
-////        CommentResponse expectedResponse = CommentResponseTestBuilder.aCommentResponse().build();
-////        String json = new ObjectMapper().writeValueAsString(expectedResponse);
-////        stubFor(WireMock.get("/comments/1")
-////                .willReturn(aResponse()
-////                        .withHeader("Content-Type", "application/json")
-////                        .withBody(json)
-////                        .withStatus(200)));
-////
-////        // Act
-////        Mono<ResponseEntity<CommentResponse>> result = commentService.get(commentId);
-////
-////        var body = result.block().getBody();
-////
-////        // Assert
-////        StepVerifier.create(result)
-////                .expectNextMatches(response -> {
-////                    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//////                    assertThat(response.getBody()).isEqualToComparingFieldByField(expectedResponse);
-////                    return true;
-////                })
-////                .verifyComplete();
-////    }
-//
-////    @Test
-////    public void shouldThrowNotFoundExceptionWhenCommentDoesNotExist() {
-////        // Arrange
-////        Long commentId = 99L;
-////        stubFor(get(urlEqualTo("/comments/" + commentId))
-////                .willReturn(aResponse()
-////                        .withStatus(404)));
-////
-////        // Act & Assert
-////        StepVerifier.create(commentService.get(commentId))
-////                .expectError(MicroserviceResponseException.class)
-////                .verify();
-////    }
-////
-////    @Test
-////    public void shouldHandleServerErrorWhenServerIsDown() {
-////        // Arrange
-////        Long commentId = 1L;
-////        stubFor(get(urlEqualTo("/comments/" + commentId))
-////                .willReturn(aResponse()
-////                        .withStatus(500)));
-////
-////        // Act & Assert
-////        StepVerifier.create(commentService.get(commentId))
-////                .expectError(MicroserviceResponseException.class)
-////                .verify();
-////    }
-//
-//
-//    private static final String HTTP_SCHEME = "http";
-//    private static final String COMMENT_SERVICE_HOST = "comment-service";
-//    private static final String COMMENTS_SEARCH_URL = "/comments/search";
-//    private static final String SEARCH_PARAM = "search";
-//    private static final String OFFSET_PARAM = "offset";
-//    private static final String LIMIT_PARAM = "limit";
-//    private static final String PAGE_SIZE_PARAM = "pageSize";
-//    private static final String NUMBER_PAGE_PARAM = "numberPage";
-//    private static final String COMMENTS_NEWS_ID_URL = "/comments/news/{id}";
-//    private static final String COMMENTS_ID_URL = "/comments/{id}";
-//    private static final String COMMENTS_URL = "/comments";
-//    private static final String COMMENTS_ARCHIVE_URL = "/comments/archive";
-//    private static final String COMMENTS_ARCHIVE_ID_URL = "/comments/archive/{id}";
-//    private static final String COMMENTS_ARCHIVE_NEWS_ID_URL = "/comments/archive/news/{id}";
-//    private static final String COMMENTS_COMMENT_ID_NEWS_NEWS_ID_URL = "/comments/{commentId}/news/{newsId}";
-//}
+package ru.clevertec.news.integration;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.test.StepVerifier;
+import ru.clevertec.exceptionhandlerstarter.exception.AccessDeniedException;
+import ru.clevertec.news.config.Config;
+import ru.clevertec.news.entity.dto.CommentRequest;
+import ru.clevertec.news.entity.dto.CommentResponse;
+import ru.clevertec.news.entity.dto.ModifyCommentRequest;
+import ru.clevertec.news.entity.dto.UserRequest;
+import ru.clevertec.news.service.CommentService;
+import ru.clevertec.news.util.CommentRequestTestBuilder;
+import ru.clevertec.news.util.CommentResponseTestBuilder;
+import ru.clevertec.news.util.PaginationResponse;
+import ru.clevertec.news.util.PaginationResponseForCommentTestBuilder;
+import ru.clevertec.news.util.UserRequestBuilderTest;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+@SpringBootTest
+@WireMockTest(httpPort = 9998)
+@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
+@Import(Config.class)
+class CommentIntegrationTest {
+
+    @Mock
+    HttpServletRequest httpServletRequest;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    CommentService commentService;
+
+    @Autowired
+    @Qualifier("webClientBuilderCommentsUrl")
+    WebClient.Builder webClientBuilder;
+
+    @Test
+    void shouldRetrieveCommentWhenStatusCodeIs2xx() throws JsonProcessingException {
+        Long commentId = 1L;
+        CommentResponse commentResponse = CommentResponseTestBuilder.aCommentResponse().build();
+        String expected = objectMapper.writeValueAsString(commentResponse);
+
+        stubFor(get(urlEqualTo("/comments/" + commentId))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<CommentResponse> actual = commentService.get(commentId).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getText()).isEqualTo("Test text comment");
+
+    }
+
+    @Test
+    void shouldRetrieveCommentByNewsIdWhenStatusCodeIs2xx() throws JsonProcessingException {
+        Long commentId = 1L;
+        Long newsId = 1L;
+        CommentResponse commentResponse = CommentResponseTestBuilder.aCommentResponse().build();
+        String expected = objectMapper.writeValueAsString(commentResponse);
+
+        stubFor(get(urlEqualTo("/comments/" + commentId + "/news/" + newsId))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<CommentResponse> actual = commentService.getCommentByNewsId(commentId, newsId).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getText()).isEqualTo("Test text comment");
+
+    }
+
+    @Test
+    void shouldRetrieveCommentByNewsIdFromArchiveWhenStatusCodeIs2xx() throws JsonProcessingException {
+        Long newsId = 1L;
+        int pageSize = 1;
+        int numberPage = 1;
+
+        PaginationResponse<CommentResponse> paginationResponse = PaginationResponseForCommentTestBuilder
+                .aPaginationResponse()
+                .build();
+        String expected = objectMapper.writeValueAsString(paginationResponse);
+
+        stubFor(get(urlEqualTo("/comments/archive/news/" + newsId + "?pageSize=1&numberPage=1"))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<PaginationResponse<CommentResponse>> actual = commentService.getCommentsByNewsIdFromArchive(newsId, pageSize, numberPage).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getContent().size()).isOne();
+        assertThat(actual.getBody().getCountPage()).isEqualTo(paginationResponse.getCountPage());
+        assertThat(actual.getBody().getPageNumber()).isEqualTo(paginationResponse.getPageNumber());
+
+    }
+
+    @Test
+    void shouldRetrieveCommentFromArchiveWhenStatusCodeIs2xx() throws JsonProcessingException {
+        Long commentId = 1L;
+        CommentResponse commentResponse = CommentResponseTestBuilder.aCommentResponse().build();
+        String expected = objectMapper.writeValueAsString(commentResponse);
+
+        stubFor(get(urlEqualTo("/comments/archive/" + commentId))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<CommentResponse> actual = commentService.getFromArchive(commentId).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getText()).isEqualTo("Test text comment");
+
+    }
+
+    @Test
+    void shouldRetrieveAllPaginationResponseCommentsWhenStatusCodeIs2xx() throws JsonProcessingException {
+        int pageSize = 1;
+        int numberPage = 1;
+
+        PaginationResponse<CommentResponse> paginationResponse = PaginationResponseForCommentTestBuilder
+                .aPaginationResponse()
+                .build();
+        String expected = objectMapper.writeValueAsString(paginationResponse);
+
+        stubFor(get(urlEqualTo("/comments" + "?pageSize=1&numberPage=1"))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<PaginationResponse<CommentResponse>> actual = commentService.getAll(pageSize, numberPage).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getContent().size()).isOne();
+        assertThat(actual.getBody().getCountPage()).isEqualTo(paginationResponse.getCountPage());
+        assertThat(actual.getBody().getPageNumber()).isEqualTo(paginationResponse.getPageNumber());
+
+    }
+
+    @Test
+    void shouldRetrieveAllPaginationResponseCommentsFromArchiveWhenStatusCodeIs2xx() throws JsonProcessingException {
+        int pageSize = 1;
+        int numberPage = 1;
+
+        PaginationResponse<CommentResponse> paginationResponse = PaginationResponseForCommentTestBuilder
+                .aPaginationResponse()
+                .build();
+        String expected = objectMapper.writeValueAsString(paginationResponse);
+
+        stubFor(get(urlEqualTo("/comments/archive" + "?pageSize=1&numberPage=1"))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<PaginationResponse<CommentResponse>> actual = commentService.getAllFromArchive(pageSize, numberPage).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getContent().size()).isOne();
+        assertThat(actual.getBody().getCountPage()).isEqualTo(paginationResponse.getCountPage());
+        assertThat(actual.getBody().getPageNumber()).isEqualTo(paginationResponse.getPageNumber());
+
+    }
+
+    @Test
+    void shouldRetrieveCreatedCommentWhenStatusCodeIs2xx() throws JsonProcessingException {
+        UserRequest userRequest = UserRequestBuilderTest.aUserRequest().build();
+
+        when(httpServletRequest.getHeader("X-User-UUID")).thenReturn(userRequest.getUuid().toString());
+        when(httpServletRequest.getHeader("X-User-Name")).thenReturn(userRequest.getUserName());
+        CommentRequest request = CommentRequestTestBuilder.aCommentRequest().build();
+        ModifyCommentRequest modifyCommentRequest = ModifyCommentRequest.builder()
+                .text(request.text())
+                .newsId(request.newsId())
+                .user(userRequest)
+                .build();
+        String expected = objectMapper.writeValueAsString(modifyCommentRequest);
+
+        stubFor(post(urlEqualTo("/comments"))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<CommentResponse> actual = commentService.create(request, httpServletRequest).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getText()).isEqualTo("Test text comment");
+        assertThat(actual.getBody().getUser().userName()).isEqualTo(userRequest.getUserName());
+        assertThat(actual.getBody().getNewsId()).isEqualTo(request.newsId());
+
+    }
+
+    @Test
+    void shouldRetrieveUpdatedCommentWhenStatusCodeIs2xx() throws JsonProcessingException {
+        UserRequest userRequest = UserRequestBuilderTest.aUserRequest().build();
+        long commentId = 1L;
+        when(httpServletRequest.getHeader("X-User-UUID")).thenReturn(userRequest.getUuid().toString());
+        when(httpServletRequest.getHeader("X-User-Name")).thenReturn(userRequest.getUserName());
+        CommentRequest request = CommentRequestTestBuilder.aCommentRequest().build();
+        ModifyCommentRequest modifyCommentRequest = ModifyCommentRequest.builder()
+                .text(request.text())
+                .newsId(request.newsId())
+                .user(userRequest)
+                .build();
+        String expected = objectMapper.writeValueAsString(modifyCommentRequest);
+
+        stubFor(get(urlEqualTo("/comments/" + commentId))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        stubFor(put(urlEqualTo("/comments/" + commentId))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        ResponseEntity<CommentResponse> actual = commentService.update(commentId, request, httpServletRequest).block();
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isNotNull();
+        assertThat(actual.getBody().getText()).isEqualTo("Test text comment");
+        assertThat(actual.getBody().getUser().userName()).isEqualTo(userRequest.getUserName());
+        assertThat(actual.getBody().getNewsId()).isEqualTo(request.newsId());
+
+    }
+
+    @Test
+    void shouldThrowAccessDeniedExceptionInMethodUpdate() throws JsonProcessingException {
+        long commentId = 1L;
+        UserRequest userRequest = UserRequestBuilderTest.aUserRequest().build();
+        when(httpServletRequest.getHeader("X-User-UUID")).thenReturn("93dee9c7-1756-4fe7-bd97-7b545c0e9467");
+        when(httpServletRequest.getHeader("X-User-Name")).thenReturn(userRequest.getUserName());
+        CommentRequest request = CommentRequestTestBuilder.aCommentRequest().build();
+        ModifyCommentRequest modifyCommentRequest = ModifyCommentRequest.builder()
+                .text(request.text())
+                .newsId(request.newsId())
+                .user(userRequest)
+                .build();
+        String expected = objectMapper.writeValueAsString(modifyCommentRequest);
+
+        stubFor(get(urlEqualTo("/comments/" + commentId))
+                .willReturn(aResponse()
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withStatus(200)
+                        .withBody(expected)));
+
+        StepVerifier.create(commentService.update(commentId, request, httpServletRequest))
+                .expectError(AccessDeniedException.class)
+                .verify();
+
+    }
+}

@@ -4,12 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import ru.clevertec.news.entity.dto.CommentRequest;
-import ru.clevertec.news.entity.dto.User;
 import ru.clevertec.news.entity.dto.UserRequest;
-
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @With
 @AllArgsConstructor

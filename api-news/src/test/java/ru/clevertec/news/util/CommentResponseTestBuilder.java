@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import ru.clevertec.news.entity.dto.CommentResponse;
-import ru.clevertec.news.entity.dto.User;
 import ru.clevertec.news.entity.dto.UserResponse;
 
 import java.time.LocalDateTime;

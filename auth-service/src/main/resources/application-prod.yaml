@@ -1,0 +1,12 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+
+aop:
+  logging:
+    enabled: true
+
+exception:
+  handling:
+    enabled: true

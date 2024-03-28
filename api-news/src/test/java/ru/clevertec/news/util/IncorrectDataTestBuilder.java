@@ -3,7 +3,7 @@ package ru.clevertec.news.util;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.With;
-import ru.clevertec.exceptionhandlerstarter.model.IncorrectData;
+import ru.clevertec.exceptionhandlerstarter.entity.IncorrectData;
 
 @With
 @AllArgsConstructor
